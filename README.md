@@ -61,3 +61,29 @@ func main() {
 - `script`: 通过shell的形式, 获取区块链的.pb和.json文件, 直接运行getBlockPayload.sh即可
 - `submit`: 提供了提交一些交易, 更新区块的方法, submitTransactions方法
 - `wallet`: 不含代码, 只是网络ca信息
+
+## 区块链数据库设计
+
+区块数据库, 记录区块的信息
+```go
+type BlockchainDB struct {
+    Block_number  int      //区块号
+    Previous_hash string   //上一个区块哈希
+    Data_hash     string   //当前区块数据哈希
+    Tx_id_list    []string //当前区块包含的tx_id列表
+}
+```
+
+交易数据库，记录交易的状态信息
+```go
+type TransactionEntry struct {
+    Tx_id                   string      //交易id
+    Timestamp               time.Time   //时间戳
+    Chaincode_function_name string      //链码名
+    Tx_content              []string    //交易内容载荷
+    Status                  interface{} //交易状态
+    Block_number            int         //区块号
+}
+
+type TransactionDB []TransactionEntry
+```
