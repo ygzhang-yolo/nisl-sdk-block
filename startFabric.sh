@@ -8,6 +8,7 @@
 set -e
 
 NETWORK_PATH="/home/zhangyiguang/fabric/fabric-samples-2.2"
+PROJECT_PATH="/home/zhangyiguang/fabric/nisl-sdk-block"
 
 # don't rewrite paths for Windows Git Bash users
 export MSYS_NO_PATHCONV=1
@@ -40,10 +41,10 @@ pushd ${NETWORK_PATH}/test-network
 popd
 
 # 修正sdk-config.yaml 配置文件
-YAML_FILE="/home/zhangyiguang/fabric/nisl-sdk-block/config/sdk-config.yaml" # 替换为实际的YAML文件路径
+YAML_FILE=${PROJECT_PATH}"/config/sdk-config.yaml" # 替换为实际的YAML文件路径
 # 定义Org1和Org2的keystore目录路径
-KEY_DIR_ORG1="/home/zhangyiguang/fabric/fabric-samples-2.2/test-network/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore"
-KEY_DIR_ORG2="/home/zhangyiguang/fabric/fabric-samples-2.2/test-network/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore"
+KEY_DIR_ORG1=${NETWORK_PATH}"/test-network/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore"
+KEY_DIR_ORG2=${NETWORK_PATH}"/test-network/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore"
 
 # 查找keystore目录下的私钥文件
 KEY_FILE_ORG1=$(ls ${KEY_DIR_ORG1}/*_sk)
@@ -71,21 +72,13 @@ Total setup execution time : $(($(date +%s) - starttime)) secs ...
 
 Next, use the FabCar applications to interact with the deployed FabCar contract.
 The FabCar applications are available in multiple programming languages.
-Follow the instructions for the programming language of your choice:
 
 Go:
+  Install dependencies and run the test using:
+    go build
+    go run nisl-sdk-block
 
-  Start by changing into the "go" directory:
-    cd go
-
-  Then, install dependencies and run the test using:
-    go run fabcar.go
-
-  The test will invoke the sample client app which perform the following:
-    - Import user credentials into the wallet (if they don't already exist there)
-    - Submit a transaction to create a new car
-    - Evaluate a transaction (query) to return details of this car
-    - Submit a transaction to change the owner of this car
-    - Evaluate a transaction (query) to return the updated details of this car
+  If you want to shut down fabric network, you can try:
+    bash networkDown.sh
 
 EOF
