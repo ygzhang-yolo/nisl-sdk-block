@@ -1,0 +1,125 @@
+name: "fabric-network"
+version: "1.0.0"
+client:
+  organization: Org1
+  logging:
+    #level: debug
+    level: info
+  cryptoconfig:
+    path: ./config/cert
+  credentialStore:
+    path: /tmp/test-network/store
+    cryptoStore:
+      path: /tmp/test-network/msp
+  BCCSP:
+    security:
+      enabled: true
+      default:
+        provider: "SW"
+      hashAlgorithm: "SHA2"
+      softVerify: true
+      level: 256
+  tlsCerts:
+    systemCertPool: false
+channels:
+  mychannel:
+    peers:
+      peer0.org1.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+    policies:
+      queryChannelConfig:
+        minResponses: 1
+        maxTargets: 1
+        retryOpts:
+          attempts: 5
+          initialBackoff: 500ms
+          maxBackoff: 5s
+          backoffFactor: 2.0
+      discovery:
+        maxTargets: 2
+        retryOpts:
+          attempts: 4
+          initialBackoff: 500ms
+          maxBackoff: 5s
+          backoffFactor: 2.0
+      eventService:
+        resolverStrategy: PreferOrg
+        balancer: Random
+        blockHeightLagThreshold: 5
+        reconnectBlockHeightLagThreshold: 10
+        peerMonitorPeriod: 5s
+organizations:
+  Org1:
+    mspid: Org1MSP
+    peers:
+      - peer0.org1.example.com
+    certificateAuthorities:
+      - ca.org1.example.com
+    users:
+      Admin:
+        cert:
+          path: /home/zhangyiguang/fabric/fabric-samples-2.2/test-network/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/cert.pem
+        key:
+          path: /home/zhangyiguang/fabric/fabric-samples-2.2/test-network/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/ec6c01d1b442185564625de252960ebda44dd023ca6a6ac41f42aed653ad00c1_sk
+  Org2:
+    mspid: Org2MSP
+    peers:
+      - peer0.org2.example.com
+    certificateAuthorities:
+      - ca.org2.example.com
+    users:
+      Admin:
+        cert:
+          path: /home/zhangyiguang/fabric/fabric-samples-2.2/test-network/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/signcerts/cert.pem
+        key:
+          path: /home/zhangyiguang/fabric/fabric-samples-2.2/test-network/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore/b82840fb5269c6863d8071ec2b03355ae0cfdb96e3832f4b75ba8a35520d4669_sk
+orderers:
+  orderer.example.com:
+    url: grpcs://localhost:7050
+    tlsCACerts:
+      path: /home/zhangyiguang/fabric/fabric-samples-2.2/test-network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+peers:
+  peer0.org1.example.com:
+    url: grpcs://localhost:7051
+    tlsCACerts:
+      path: /home/zhangyiguang/fabric/fabric-samples-2.2/test-network/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+    grpcOptions:
+      ssl-target-name-override: peer0.org1.example.com
+  peer0.org2.example.com:
+    url: grpcs://localhost:9051
+    tlsCACerts:
+      path: /home/zhangyiguang/fabric/fabric-samples-2.2/test-network/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+    grpcOptions:
+      ssl-target-name-override: peer0.org2.example.com
+certificateAuthorities:
+  ca.org1.example.com:
+    url: https://localhost:7054
+    tlsCACerts:
+      path: /home/zhangyiguang/fabric/fabric-samples-2.2/test-network/organizations/fabric-ca/org1/ca-cert.pem
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+    caName: ca-org1
+  ca.org2.example.com:
+    url: https://localhost:8054
+    tlsCACerts:
+      path: /home/zhangyiguang/fabric/fabric-samples-2.2/test-network/organizations/fabric-ca/org2/ca-cert.pem
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+    caName: ca-org2
+entityMatchers:
+  peer:
+    - pattern: (\w*)peer0.org1.example.com(\w*)
+      urlSubstitutionExp: grpcs://localhost:7051
+      eventUrlSubstitutionExp: grpcs://localhost:7053
+      sslTargetOverrideUrlSubstitutionExp: peer0.org1.example.com
+      mappedHost: peer0.org1.example.com
+  orderer:
+    - pattern: (.*)
+      urlSubstitutionExp: grpcs://orderer.example.com:7050
+      sslTargetOverrideUrlSubstitutionExp: orderer.example.com
+      mappedHost: orderer.example.com
